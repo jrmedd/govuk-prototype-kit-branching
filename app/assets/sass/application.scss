@@ -4,3 +4,70 @@
 // 
 
 // Add extra styles here
+
+code {
+  background-color: $govuk-secondary-text-colour;
+  color: $govuk-body-background-colour;
+  padding: .125rem;
+}
+
+.govuk-input-pair {
+  display: flex;
+  flex-flow: row wrap;
+  gap: govuk-spacing(5);
+  align-items: center;
+
+  .govuk-form-group {
+    position: relative;
+    flex: 1;
+    label {
+      position: relative;
+      @include govuk-media-query($until: tablet) {
+        &:after {
+          top: 2.5rem;
+        }
+      }
+      @include govuk-media-query($from: tablet) {
+        &:after {
+          top: 3rem;
+        }
+      }
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 0.4375em;
+        height: 0.4375em;
+        margin: auto 0;
+        transform: rotate(45deg);
+        border: solid;
+        border-width: 1px 1px 0 0;
+        border-color: $govuk-secondary-text-colour;
+      }
+
+    }
+    &:first-child {
+      label {
+        &:after {
+          right: -1rem;
+        }
+      }
+    }
+    &:last-child {
+      label {
+        &:after {
+          left: -1rem;
+        }
+      }
+    }
+  }
+
+  span {
+    font-family: $govuk-font-family;
+    font-size: 1rem;
+    margin: 0;
+    text-align: center;
+    display: inline-block;
+    height: fit-content;
+  }
+}
