@@ -1,0 +1,58 @@
+{% extends "layouts/main.html" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/configure-branching">
+      {{
+        govukInput({
+          label: {
+            text: 'What is the name of your question?',
+            classes: "govuk-label--l",
+            isPageHeading: true
+          },
+          hint: {
+            html: '<p class="govuk-hint">The name of the input is set as <code>name="input-name"</code> in HTML or <code>name: "inputName"</code> in Nunjucks.'
+          },
+          name: 'name-of-input'
+        })
+      }}
+      {{
+        govukRadios({
+          classes: 'govuk-radios--inline',
+          name: 'inputType',
+          fieldset: {
+            legend: {
+              text: 'What type of input are you using?'
+            }
+          },
+          items: [
+            {
+              value: 'radios',
+              text: 'Radios'
+            },
+            {
+              value: 'checkboxes',
+              text: 'Checkboxes'
+            }
+          ]
+        })
+      }}
+      {{
+        govukInput({
+          label: {
+            text: 'How many options does your question have?'
+          },
+          classes: 'govuk-input--width-2',
+          name: 'number-of-inputs'
+        })
+      }}
+      {{
+        govukButton({
+          text: 'Continue'
+        })
+      }}
+    </form>
+  </div>
+</div>
+{% endblock %}

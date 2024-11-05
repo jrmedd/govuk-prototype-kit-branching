@@ -1,0 +1,23 @@
+{% extends "layouts/main.html" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{
+      govukCheckboxes({
+        name: 'james-test',
+        items: [
+          {
+            value: 'city',
+            text: 'Manchester City'
+          },
+          {
+            value: 'united',
+            text: 'Manchester United'
+          }
+        ]
+      })
+    }}
+  </div>
+</div>
+{% endblock %}

@@ -40,12 +40,19 @@ async function readFiles(filePaths) {
     return fileContentsWithImports
 }
 
-router.get('/files', async (req, res) => {
-  const files = getFilesInDirectory(path.join(__dirname) + '/views', ['.html','.njk'], ['layouts'])
+router.get('/get-questions', async (req, res) => {
+  const files = getFilesInDirectory(path.join(__dirname) + '/views', ['.html','.njk'], ['layouts', 'branching-configuration', 'branching-details'])
   const filesContent = await readFiles(files)
   const newEnv = res.app.locals.settings.nunjucksEnv
   const renderedFiles = filesContent.map(content => (new jsdom.JSDOM(newEnv.renderString(content))))
-  res.json(files)
+  const questions = renderedFiles.map(file => {
+    return [...Array.from(file.window.document.querySelectorAll('input[type="radio"], input[type="checkbox"]')).map((input, inputIndex) => {
+      const value = input.value
+      const label = input.parentElement.querySelector('label') ? input.parentElement.querySelector('label').textContent.trim() : `Answer ${inputIndex}`
+      return ({input: value, label: label})
+    })]
+  })
+  res.json(questions)
 })
 
 router.get('/configure-branching', async (req, res) => {
