@@ -1,0 +1,26 @@
+{% extends "layouts/main.html" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/branching-details">
+       {{
+        govukInput({
+          label: {
+            text: 'How many options does your question have?',
+            isPageHeading: true,
+            classes: 'govuk-label--l'
+          },
+          classes: 'govuk-input--width-2',
+          name: 'number-of-inputs'
+        })
+      }}
+      {{
+        govukButton({
+          text: 'Continue'
+        })
+      }}
+    </form>
+  </div>
+</div>
+{% endblock %}

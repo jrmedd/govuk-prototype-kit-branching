@@ -41,46 +41,55 @@ async function readFiles(filePaths) {
 }
 
 router.get('/get-questions', async (req, res) => {
-  const files = getFilesInDirectory(path.join(__dirname) + '/views', ['.html','.njk'], ['layouts', 'branching-configuration.html', 'branching-details.html'])
-  const filesContent = await readFiles(files)
-  const newEnv = res.app.locals.settings.nunjucksEnv
-  const renderedFiles = filesContent.map(content => (new jsdom.JSDOM(newEnv.renderString(content))))
-  const questions = renderedFiles.map(file => {
-    return [...Array.from(file.window.document.querySelectorAll('input[type="radio"], input[type="checkbox"]')).map((input, inputIndex) => {
-      const type = input.type
-      const name = input.name
-      const value = input.value
-      const label = input.nextElementSibling ? input.nextElementSibling.textContent.trim() : `Answer ${inputIndex}`
-      const fieldset = input.closest('fieldset') ? input.closest('fieldset').querySelector('legend').textContent.trim() : 'Fieldset'
-      return ({name, value, label, type, fieldset})
-    })]
-  }).filter(inputs => inputs.length > 0).flat().reduce((acc, item) => {
-    let existingGroup = acc.find(group => group.question === item.fieldset);
-    if (!existingGroup) {
-    existingGroup = {
-      question: item.fieldset,
-      name: item.name,
-      type: item.type,
-      items: []
-    };
-    acc.push(existingGroup);
+  try {
+    const files = getFilesInDirectory(
+      path.join(__dirname, 'views'),
+      ['.html', '.njk'],
+      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-question.html', 'number-of-options.html']
+    );
+    const filesContent = await readFiles(files);
+    const newEnv = res.app.locals.settings.nunjucksEnv;
+    const questions = filesContent.flatMap(content => {
+      const document = new jsdom.JSDOM(newEnv.renderString(content)).window.document;
+      const inputs = Array.from(document.querySelectorAll('input[type="radio"], input[type="checkbox"]'));
+
+      return inputs.map((input, inputIndex) => {
+        const fieldsetElement = input.closest('fieldset');
+        return {
+          name: input.name,
+          value: input.value,
+          label: input.nextElementSibling?.textContent.trim() || `Answer ${inputIndex}`,
+          type: input.type,
+          fieldset: fieldsetElement ? fieldsetElement.querySelector('legend')?.textContent.trim() : 'Fieldset'
+        };
+      });
+    }).filter(Boolean);
+    const groupedQuestions = questions.reduce((acc, { name, value, label, type, fieldset }) => {
+      let group = acc.find(g => g.question === fieldset);
+      if (!group) {
+        group = { question: fieldset, name, type, items: [] };
+        acc.push(group);
+      }
+      group.items.push({ value, label });
+      return acc;
+    }, []);
+
+    res.json(groupedQuestions);
+  } catch (error) {
+    console.error('Error processing questions:', error);
+    res.status(500).send('Error processing questions');
   }
-
-    existingGroup.items.push({
-      value: item.value,
-      label: item.label
-    });
-
-    return acc;
-  }, []);
-  res.json(questions)
-})
+});
 
 router.get('/configure-branching', async (req, res) => {
-  const files = getFilesInDirectory(path.join(__dirname) + '/views', ['.html','.njk'], ['layouts', 'branching-configuration.html', 'branching-details.html'])
+const files = getFilesInDirectory(
+      path.join(__dirname, 'views'),
+      ['.html', '.njk'],
+      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-question.html', 'number-of-options.html']
+    ); 
   const filesContent = await readFiles(files)
-  const newEnv = res.app.locals.settings.nunjucksEnv
-  const renderedFiles = filesContent.map(content => (new jsdom.JSDOM(newEnv.renderString(content))))
+  const newEnv = res.app.locals.settings.nunjucksEnv;
+  const renderedFiles = filesContent.map(content => new jsdom.JSDOM(newEnv.renderString(content)))
   req.session.data.answersToMap = undefined
   renderedFiles.some(file => {
     const inputs = file.window.document.querySelectorAll(`input[name="${req.session.data['name-of-input']}"]`)
@@ -89,7 +98,16 @@ router.get('/configure-branching', async (req, res) => {
     }
     return inputs.length > 0
   })
-  res.redirect('/branching-details')
+  if (req.session.data.answersToMap) {
+    res.redirect('/branching-details')
+  } else {
+    res.redirect('/type-of-question')
+  }
+})
+
+router.get('/select-for-branching', (req, res) => {
+  req.session.data['name-of-input'] = req.query.name
+  res.redirect('/configure-branching')
 })
 
 // Add your routes here

@@ -1,0 +1,38 @@
+{% extends "layouts/main.html" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/number-of-options">
+      {{
+        govukRadios({
+          classes: 'govuk-radios--inline',
+          name: 'inputType',
+          fieldset: {
+            legend: {
+              text: 'What type of input are you using?',
+              isPageHeading: true,
+              classes: 'govuk-fieldset__legend--l'
+            }
+          },
+          items: [
+            {
+              value: 'radios',
+              text: 'Radios'
+            },
+            {
+              value: 'checkboxes',
+              text: 'Checkboxes'
+            }
+          ]
+        })
+      }}
+      {{
+        govukButton({
+          text: 'Continue'
+        })
+      }}
+    </form>
+  </div>
+</div>
+{% endblock %}
