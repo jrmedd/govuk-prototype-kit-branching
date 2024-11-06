@@ -3,6 +3,14 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
+    {% if error %}
+    {{
+      govukErrorSummary({
+        titleText: 'There is a problem',
+        errorList: errors
+      })
+    }}
+    {% endif %}
     <form action="/configure-branching">
       {{
         govukInput({
@@ -14,8 +22,9 @@
           hint: {
             html: '<p class="govuk-hint">The name of the input is set as <code>name="input-name"</code> in HTML or <code>name: "inputName"</code> in Nunjucks.</p>'
           },
-          name: 'name-of-input'
-        })
+          id: 'nameOfInput',
+          name: 'nameOfInput'
+        } | errorFilter(errors))
       }}
       {{
         govukButton({

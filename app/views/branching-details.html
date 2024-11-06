@@ -2,7 +2,7 @@
 
 {% block content %}
 
-{% set answers = data.answersToMap if data.answersToMap else range(data['number-of-inputs']) %}
+{% set answers = data.answersToMap if data.answersToMap else range(data.numberOfOptions) %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">

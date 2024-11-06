@@ -17,7 +17,7 @@ async function fetchQuestions() {
         const listItem = document.createElement('li')
         const subListItem = document.createElement('ul')
         subListItem.innerHTML = `<li>Type: ${ question.type.title() } (${question.items.length} items)</li><li>Name: <code>"${question.name}"</code></li><li>Options: ${question.items.pluck('label', ', ')}</li>`
-        listItem.innerHTML = `<a class="govuk-link govuk-link--no-visited-state" href="/select-for-branching?name=${question.name}">${question.question}</a>`
+        listItem.innerHTML = `<a class="govuk-link govuk-link--no-visited-state" href="/select-for-branching?nameOfInput=${question.name}&typeOfInput=${question.type}">${question.question}</a>`
         listItem.appendChild(subListItem)
         questionList.appendChild(listItem)
       })
@@ -34,6 +34,6 @@ async function fetchQuestions() {
 }
 
 window.GOVUKPrototypeKit.documentReady(() => {
-  if (location.pathname === '/branching-configuration') fetchQuestions() 
+  if (['/branching-configuration', '/configure-branching'].includes(location.pathname)) fetchQuestions() 
 }) 
 

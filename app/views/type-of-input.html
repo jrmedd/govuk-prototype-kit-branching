@@ -3,11 +3,19 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="/number-of-options">
+    {% if error %}
+    {{
+      govukErrorSummary({
+        titleText: 'There is a problem',
+        errorList: errors
+      })
+    }}
+    {% endif %}
+    <form action="/type-of-input-answer">
       {{
         govukRadios({
           classes: 'govuk-radios--inline',
-          name: 'inputType',
+          name: 'typeOfInput',
           fieldset: {
             legend: {
               text: 'What type of input are you using?',
@@ -17,15 +25,15 @@
           },
           items: [
             {
-              value: 'radios',
+              value: 'radio',
               text: 'Radios'
             },
             {
-              value: 'checkboxes',
+              value: 'checkbox',
               text: 'Checkboxes'
             }
           ]
-        })
+        } | errorFilter(errors))
       }}
       {{
         govukButton({

@@ -45,7 +45,7 @@ router.get('/get-questions', async (req, res) => {
     const files = getFilesInDirectory(
       path.join(__dirname, 'views'),
       ['.html', '.njk'],
-      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-question.html', 'number-of-options.html']
+      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-input.html', 'number-of-options.html']
     );
     const filesContent = await readFiles(files);
     const newEnv = res.app.locals.settings.nunjucksEnv;
@@ -82,17 +82,21 @@ router.get('/get-questions', async (req, res) => {
 });
 
 router.get('/configure-branching', async (req, res) => {
-const files = getFilesInDirectory(
+  const nameOfInput = req.session.data.nameOfInput
+  if (nameOfInput.length === 0 || nameOfInput === undefined) {
+    return res.render('branching-configuration', {error: true, errors: [{'href': '#nameOfInput', 'text': 'Enter a question name'}]})
+  }
+  const files = getFilesInDirectory(
       path.join(__dirname, 'views'),
       ['.html', '.njk'],
-      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-question.html', 'number-of-options.html']
+      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-input.html', 'number-of-options.html']
     ); 
   const filesContent = await readFiles(files)
   const newEnv = res.app.locals.settings.nunjucksEnv;
   const renderedFiles = filesContent.map(content => new jsdom.JSDOM(newEnv.renderString(content)))
   req.session.data.answersToMap = undefined
   renderedFiles.some(file => {
-    const inputs = file.window.document.querySelectorAll(`input[name="${req.session.data['name-of-input']}"]`)
+    const inputs = file.window.document.querySelectorAll(`input[name="${req.session.data['nameOfInput']}"]`)
     if (inputs.length > 0) {
       req.session.data.answersToMap = Array.from(inputs).map(input => ({type: input.type, value: input.value, label: input.parentElement.querySelector('label').textContent}))
     }
@@ -101,12 +105,21 @@ const files = getFilesInDirectory(
   if (req.session.data.answersToMap) {
     res.redirect('/branching-details')
   } else {
-    res.redirect('/type-of-question')
+    req.session.data.typeOfInput = undefined
+    req.session.data.numberOfInputs = undefined
+    res.redirect('/type-of-input')
+  }
+})
+
+router.get('/type-of-input-answer', (req, res) => {
+  if (req.session.data.typeOfInput === undefined) {
+    res.render('type-of-input', {error: true, errors: [{'href': '#typeOfInput', 'text': 'Select if your input is a radio button or checkbox input.'}]})
   }
 })
 
 router.get('/select-for-branching', (req, res) => {
-  req.session.data['name-of-input'] = req.query.name
+  req.session.data['nameOfInput'] = req.query.name
+  req.session.data['type-of-input'] = req.query.name
   res.redirect('/configure-branching')
 })
 
