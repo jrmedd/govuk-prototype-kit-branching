@@ -3,13 +3,15 @@
 // https://prototype-kit.service.gov.uk/docs/create-routes
 //
 const fs = require('fs')
-const jsdom = require('jsdom')
 const path = require('path')
+const jsdom = require('jsdom')
+hljs = require('highlight.js/lib/common')
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const macros = require('govuk-frontend/govuk-prototype-kit.config.json').nunjucksMacros
 const macroImport = macros.map(macro => `{% from "${macro.importFrom}" import ${macro.macroName} %}`).join(' ')
 
+String.prototype.url = function(){ return this[0] !== '/' ? `/${this}` : this }
 
 function getFilesInDirectory(dir, fileTypes = ['.html', '.njk'], ignore = []) {
   let results = [];
@@ -132,7 +134,44 @@ router.get('/number-of-options-answer', (req, res) => {
 
 router.get('/select-for-branching', (req, res) => {
   req.session.data.nameOfInput = req.query.nameOfInput
+  req.session.data.typeOfInput = req.query.typeOfInput
+  req.session.data.numberOfOptions = req.query.numberOfOptions
   res.redirect('/configure-branching')
 })
 
+router.get('/produce-branching-code', (req, res) => {
+  const nameOfInput = req.session.data.nameOfInput
+  const numberOfOptions = parseInt(req.session.data.numberOfOptions)
+  const cases = Array(numberOfOptions).fill(0).map((_, index) => {
+    const answer =req.session.data[`answer-${index}`]
+    const page = req.session.data[`page-${index}`]
+    return (`\n    case '${answer}':\n      res.redirect('${page.url()}')\n      break`)
+  })
+  const switchCode = `switch (req.session.data['${nameOfInput}']) {${cases.join('')}\n  }`
+  const routeCode = `router.get('/${nameOfInput.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}-answer', (req, res) => {\n  ${switchCode}\n})`
+  req.session.data.code = routeCode
+  res.redirect('/code-review')
+})
+
+router.get('/code-review', (req, res) => {
+  const code = req.session.data.code
+  const highlightedCode = hljs.highlight(code, {language: 'js'}).value
+  res.render('/branching-code', {highlightedCode, code})
+})
 // Add your routes here
+router.get('/where-do-you-live-answer', (req, res) => {
+    switch (req.session.data['whereDoYouLive']) {
+      case 'england':
+        res.redirect('/test')
+        break
+      case 'scotland':
+        res.redirect('/blah')
+        break
+      case 'wales':
+        res.redirect('/something')
+        break
+      case 'northern-ireland':
+        res.redirect('/yes')
+        break
+    }
+})

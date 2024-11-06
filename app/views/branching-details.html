@@ -8,30 +8,37 @@
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-l">Configure branches</h1>
     <p class="govuk-body">Indicate where each answer should take you.</p>
-    <form action="/produce-code">
-    {% for answer in answers %}
-    <fieldset class="govuk-fieldset govuk-input-pair">
-      {{
-        govukInput({
-          label: {
-            text: answer.label if answer.label else 'Answer ' + loop.index
-          },
-          value: answer.value if answer.value,
-          disabled: true if answer.value else false
-        })
-      }}
-      <span>goes to</span>
-      {{
-        govukInput({
-          label: {
-            text: 'Page name'
-          },
-          id: 'page-' + loop.index0,
-          name: 'page-' + loop.index0
-        })
+    <form action="/produce-branching-code">
+      {% for answer in answers %}
+      <fieldset class="govuk-fieldset govuk-input-pair">
+        {{
+          govukInput({
+            label: {
+              text: answer.label if answer.label else 'Answer ' + loop.index
+            },
+            id: 'answer-' + loop.index0,
+            name: 'answer-' + loop.index0,
+            value: answer.value if answer.value else data['answer'+loop.index0],
+            disabled: true if answer.value else false
+          })
         }}
-    </fieldset>
-    {% endfor %}
+        {% if answer.value %}<input type="hidden" name="answer-{{ loop.index0 }}" value="{{ answer.value }}">{% endif %}
+        <span>goes to</span>
+        {{
+          govukInput({
+            label: {
+              text: 'Page name'
+            },
+            id: 'page-' + loop.index0,
+            name: 'page-' + loop.index0,
+            value: data['page-' + loop.index0]
+          })
+          }}
+      </fieldset>
+      {% endfor %}
+      {{ govukButton({
+        text: 'Generate branching code'
+      }) }}
     </form>
   </div>
 </div>

@@ -8,6 +8,7 @@
     "@govuk-prototype-kit/common-templates": "2.0.1",
     "govuk-frontend": "5.7.1",
     "govuk-prototype-kit": "13.16.2",
+    "highlight.js": "^11.10.0",
     "jsdom": "^25.0.1"
   }
 }
