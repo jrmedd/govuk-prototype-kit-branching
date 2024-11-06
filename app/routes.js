@@ -82,8 +82,7 @@ router.get('/get-questions', async (req, res) => {
 });
 
 router.get('/configure-branching', async (req, res) => {
-  const nameOfInput = req.session.data.nameOfInput
-  if (nameOfInput.length === 0 || nameOfInput === undefined) {
+  if (req.session.data.nameOfInput?.length === 0 || req.session.data.nameOfInput === undefined) {
     return res.render('branching-configuration', {error: true, errors: [{'href': '#nameOfInput', 'text': 'Enter a question name'}]})
   }
   const files = getFilesInDirectory(
@@ -96,7 +95,7 @@ router.get('/configure-branching', async (req, res) => {
   const renderedFiles = filesContent.map(content => new jsdom.JSDOM(newEnv.renderString(content)))
   req.session.data.answersToMap = undefined
   renderedFiles.some(file => {
-    const inputs = file.window.document.querySelectorAll(`input[name="${req.session.data['nameOfInput']}"]`)
+    const inputs = file.window.document.querySelectorAll(`input[name="${req.session.data.nameOfInput}"]`)
     if (inputs.length > 0) {
       req.session.data.answersToMap = Array.from(inputs).map(input => ({type: input.type, value: input.value, label: input.parentElement.querySelector('label').textContent}))
     }
@@ -132,8 +131,7 @@ router.get('/number-of-options-answer', (req, res) => {
 })
 
 router.get('/select-for-branching', (req, res) => {
-  req.session.data['nameOfInput'] = req.query.name
-  req.session.data['type-of-input'] = req.query.name
+  req.session.data.nameOfInput = req.query.nameOfInput
   res.redirect('/configure-branching')
 })
 
