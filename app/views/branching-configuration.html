@@ -23,7 +23,8 @@
             html: '<p class="govuk-hint">The name of the input is set as <code>name="input-name"</code> in HTML or <code>name: "inputName"</code> in Nunjucks.</p>'
           },
           id: 'nameOfInput',
-          name: 'nameOfInput'
+          name: 'nameOfInput',
+          value: data.nameOfInput
         } | errorFilter(errors))
       }}
       {{

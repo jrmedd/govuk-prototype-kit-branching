@@ -106,7 +106,7 @@ router.get('/configure-branching', async (req, res) => {
     res.redirect('/branching-details')
   } else {
     req.session.data.typeOfInput = undefined
-    req.session.data.numberOfInputs = undefined
+    req.session.data.numberOfOptions = undefined
     res.redirect('/type-of-input')
   }
 })
@@ -114,6 +114,20 @@ router.get('/configure-branching', async (req, res) => {
 router.get('/type-of-input-answer', (req, res) => {
   if (req.session.data.typeOfInput === undefined) {
     res.render('type-of-input', {error: true, errors: [{'href': '#typeOfInput', 'text': 'Select if your input is a radio button or checkbox input.'}]})
+  } else {
+    res.redirect('number-of-options')
+  }
+})
+
+router.get('/number-of-options-answer', (req, res) => {
+  if (req.session.data.numberOfOptions.length === 0) {
+    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': `Enter the number ${req.session.data.typeOfInput === 'radio' ? 'radio buttons' : 'checkboxes'} input has.`}]})
+  } else if (isNaN(parseInt(req.session.data.numberOfOptions))) {
+    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a number.'}]})
+  } else if (parseInt(req.session.data.numberOfOptions).toString() !== req.session.data.numberOfOptions) {
+    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a whole number.'}]})
+  } else {
+    res.redirect('/branching-details')
   }
 })
 

@@ -3,7 +3,15 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="/branching-details">
+    {% if error %}
+    {{
+      govukErrorSummary({
+        titleText: 'There is a problem',
+        errorList: errors
+      })
+    }}
+    {% endif %}
+    <form action="/number-of-options-answer">
        {{
         govukInput({
           label: {
@@ -12,8 +20,9 @@
             classes: 'govuk-label--l'
           },
           classes: 'govuk-input--width-2',
-          name: 'numberOfOptions'
-        })
+          name: 'numberOfOptions',
+          value: data.numberOfOptions
+        } | errorFilter(errors))
       }}
       {{
         govukButton({
