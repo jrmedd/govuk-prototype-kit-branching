@@ -1,15 +1,15 @@
 {
   "name": "govuk-prototype-kit-branching",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Simplifies creating branching logic in the GOV.UK prototype kit..",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jrmedd/govuk-prototype-kit-branhing.git"
+    "url": "git+https://github.com/jrmedd/govuk-prototype-kit-branching.git"
   },
   "bugs": {
-    "url": "https://github.com/jrmedd/govuk-prototype-kit-branhing/issues"
+    "url": "https://github.com/jrmedd/govuk-prototype-kit-branching/issues"
   },
-  "homepage": "https://github.com/jrmedd/govuk-prototype-kit-branhing#readme",
+  "homepage": "https://github.com/jrmedd/govuk-prototype-kit-branching#readme",
   "keywords": [
     "prototyping",
     "government",
