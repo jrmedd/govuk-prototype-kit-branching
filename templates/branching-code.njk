@@ -1,15 +1,24 @@
 {% extends "layouts/main.html" %}
 
+{% block pageTitle %}
+Branching code - GOV.UK prototpye kit branching code creator
+{% endblock %}
+
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <h1 class="govuk-heading-l">Branching code</h1>
+    <p class="govuk-body">
+      Below is the necessary code for branching based on your selected options.
+    </p>
     <h2 class="govuk-heading-m">Javascript</h2>
+    <p class="govuk-body">Paste this into your `<code>app/routes.js</code> file.</p>
     <div class="govuk-code-container">
       <pre><code>{{ highlightedCode | safe }}</code></pre>
       <button class="app-copy-button">Copy code</button>
     </div>
     <h2 class="govuk-heading-m">HTML</h2>
+    <p class="govuk-body">Inorder for the above route to work, you'll need to wrap a <code>form</code> with the right action. Put this on your question page around your input.</p>
     <div class="govuk-code-container">
       <pre><code>{{ highlightedFormCode | safe }}</code></pre>
       <button class="app-copy-button">Copy code</button>

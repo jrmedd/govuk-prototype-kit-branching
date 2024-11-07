@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "description": "Simplifies creating branching logic in the GOV.UK prototype kit.",
+    "urls": {
+      "documentation": "https://github.com/jrmedd/govuk-prototype-kit-branching",
+      "releaseNotes": "https://github.com/jrmedd/govuk-prototype-kit-branching",
+      "versionHistory": "https://npmjs.com/package/govuk-prototype-kit-branching?activeTab=versions"
+    }
+  },
+  "pluginDependencies": [
+    {
+      "packageName": "govuk-frontend",
+      "minVersion": "5.6.0"
+    }
+  ],
+  "nunjucksPaths": [
+    "/"
+  ],
+  "importNunjucksMacrosInto": [
+    "/templates/branching-code.njk",
+    "/templates/branching-configuration.njk",
+    "/templates/branching-details.njk",
+    "/templates/number-of-options.njk",
+    "/templates/type-of-input.njk"
+  ],
+  "sass": [
+    "/sass/application.scss"
+  ],
+  "scripts": [
+    "/javascripts/application.js"
+  ],
+  "nunjucksFilters": [
+    "/lib/filters.js"
+  ]
+}

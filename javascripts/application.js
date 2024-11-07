@@ -1,8 +1,3 @@
-//
-// For guidance on how to add JavaScript see:
-// https://prototype-kit.service.gov.uk/docs/adding-css-javascript-and-images
-//
-
 String.prototype.title = function() {return this.charAt(0).toUpperCase() + this.slice(1)}
 
 Array.prototype.pluck = function(key, delimiter) {return this.map(item => item[key]).join(delimiter)}
@@ -34,8 +29,9 @@ async function fetchQuestions() {
 }
 
 async function codeToClipboard(event) {
-  const code = event.target.parentElement.querySelector('code')
-  await navigator.clipboard.writeText(code.textContent)
+  const button = event.target
+  const code = button.parentElement.querySelector('code')
+  await navigator.clipboard.writeText(code.textContent).then(done => button.textContent = 'Code copied')
 }
 
 window.GOVUKPrototypeKit.documentReady(() => {

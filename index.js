@@ -1,13 +1,7 @@
-//
-// For guidance on how to create routes see:
-// https://prototype-kit.service.gov.uk/docs/create-routes
-//
 const fs = require('fs')
 const path = require('path')
 const jsdom = require('jsdom')
 const hljs = require('highlight.js/lib/common')
-const govukPrototypeKit = require('govuk-prototype-kit')
-const router = govukPrototypeKit.requests.setupRouter()
 const macros = require('govuk-frontend/govuk-prototype-kit.config.json').nunjucksMacros
 const macroImport = macros.map(macro => `{% from "${macro.importFrom}" import ${macro.macroName} %}`).join(' ')
 
@@ -42,12 +36,12 @@ async function readFiles(filePaths) {
     return fileContentsWithImports
 }
 
-router.get('/get-questions', async (req, res) => {
+const getQuestions = async (req, res) => {
   try {
     const files = getFilesInDirectory(
-      path.join(__dirname, 'views'),
+      'app/views',
       ['.html', '.njk'],
-      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-input.html', 'number-of-options.html']
+      ['layouts', 'branching-configuration.njk', 'branching-details.njk', 'type-of-input.njk', 'number-of-options.njk']
     );
     const filesContent = await readFiles(files);
     const newEnv = res.app.locals.settings.nunjucksEnv;
@@ -81,16 +75,16 @@ router.get('/get-questions', async (req, res) => {
     console.error('Error processing questions:', error);
     res.status(500).send('Error processing questions');
   }
-});
+}
 
-router.get('/configure-branching', async (req, res) => {
+const configureBranching = async (req, res) => {
   if (req.session.data.nameOfInput?.length === 0 || req.session.data.nameOfInput === undefined) {
-    return res.render('branching-configuration', {error: true, errors: [{'href': '#nameOfInput', 'text': 'Enter a question name'}]})
+    return res.render('templates/branching-configuration', {error: true, errors: [{'href': '#nameOfInput', 'text': 'Enter a question name'}]})
   }
   const files = getFilesInDirectory(
-      path.join(__dirname, 'views'),
+      'app/views',
       ['.html', '.njk'],
-      ['layouts', 'branching-configuration.html', 'branching-details.html', 'type-of-input.html', 'number-of-options.html']
+      ['layouts', 'branching-configuration.njk', 'branching-details.njk', 'type-of-input.njk', 'number-of-options.njk']
     ); 
   const filesContent = await readFiles(files)
   const newEnv = res.app.locals.settings.nunjucksEnv;
@@ -110,36 +104,36 @@ router.get('/configure-branching', async (req, res) => {
     req.session.data.numberOfOptions = undefined
     res.redirect('/type-of-input')
   }
-})
+}
 
-router.get('/type-of-input-answer', (req, res) => {
+const typeOfInputAnswer = (req, res) => {
   if (req.session.data.typeOfInput === undefined) {
-    res.render('type-of-input', {error: true, errors: [{'href': '#typeOfInput', 'text': 'Select if your input is a radio button or checkbox input.'}]})
+    res.render('templates/type-of-input', {error: true, errors: [{'href': '#typeOfInput', 'text': 'Select if your input is a radio button or checkbox input.'}]})
   } else {
     res.redirect('number-of-options')
   }
-})
+}
 
-router.get('/number-of-options-answer', (req, res) => {
+const numberOfOptionsAnswer = (req, res) => {
   if (req.session.data.numberOfOptions.length === 0) {
-    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': `Enter the number ${req.session.data.typeOfInput === 'radio' ? 'radio buttons' : 'checkboxes'} input has.`}]})
+    res.render('templates/number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': `Enter the number ${req.session.data.typeOfInput === 'radio' ? 'radio buttons' : 'checkboxes'} input has.`}]})
   } else if (isNaN(parseInt(req.session.data.numberOfOptions))) {
-    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a number.'}]})
+    res.render('templates/number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a number.'}]})
   } else if (parseInt(req.session.data.numberOfOptions).toString() !== req.session.data.numberOfOptions) {
-    res.render('number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a whole number.'}]})
+    res.render('templates/number-of-options', {error: true, errors: [{'href': '#numberOfOptions', 'text': 'Number of options must be a whole number.'}]})
   } else {
     res.redirect('/branching-details')
   }
-})
+}
 
-router.get('/select-for-branching', (req, res) => {
+const selectForBranching = (req, res) => {
   req.session.data.nameOfInput = req.query.nameOfInput
   req.session.data.typeOfInput = req.query.typeOfInput
   req.session.data.numberOfOptions = req.query.numberOfOptions
   res.redirect('/configure-branching')
-})
+}
 
-router.get('/produce-branching-code', (req, res) => {
+const produceBranchingCode =(req, res) => {
   const nameOfInput = req.session.data.nameOfInput
   const numberOfOptions = parseInt(req.session.data.numberOfOptions)
   const cases = Array(numberOfOptions).fill(0).map((_, index) => {
@@ -151,13 +145,23 @@ router.get('/produce-branching-code', (req, res) => {
   const routeCode = `router.get('/${nameOfInput.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}-answer', (req, res) => {\n  ${switchCode}\n})`
   req.session.data.code = routeCode
   res.redirect('/code-review')
-})
+}
 
-router.get('/code-review', (req, res) => {
+const codeReview = (req, res) => {
   const nameOfInput = req.session.data.nameOfInput
   const code = req.session.data.code
   const highlightedCode = hljs.highlight(code, {language: 'js'}).value
-  const formCode = `<form action="${nameOfInput.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}-answer">\n  <!-- Your form field goes here -->\n</form>`
+  const formCode = `<form action="/${nameOfInput.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}-answer">\n  <!-- Your form field goes here -->\n</form>`
   const highlightedFormCode = hljs.highlight(formCode, {language: 'html'}).value
-  res.render('/branching-code', {highlightedCode, highlightedFormCode})
-})
+  res.render('templates/branching-code', {highlightedCode, highlightedFormCode})
+}
+
+module.exports = { 
+  getQuestions,
+  configureBranching,
+  typeOfInputAnswer,
+  numberOfOptionsAnswer,
+  selectForBranching,
+  produceBranchingCode,
+  codeReview 
+}

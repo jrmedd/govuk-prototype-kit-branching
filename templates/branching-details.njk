@@ -1,5 +1,9 @@
 {% extends "layouts/main.html" %}
 
+{% block pageTitle %}
+Branching details - GOV.UK prototpye kit branching code creator
+{% endblock %}
+
 {% block content %}
 
 {% set answers = data.answersToMap if data.answersToMap else range(data.numberOfOptions) %}
