@@ -33,7 +33,13 @@ async function fetchQuestions() {
   }
 }
 
+async function codeToClipboard(event) {
+  const code = event.target.parentElement.querySelector('code')
+  await navigator.clipboard.writeText(code.textContent)
+}
+
 window.GOVUKPrototypeKit.documentReady(() => {
   if (['/branching-configuration', '/configure-branching'].includes(location.pathname)) fetchQuestions() 
-}) 
-
+  if (['/code-review'].includes(location.pathname)) document.querySelectorAll('.app-copy-button').forEach(button => button.addEventListener('click', codeToClipboard))
+})
+ 

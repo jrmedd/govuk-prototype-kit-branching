@@ -5,7 +5,7 @@
 const fs = require('fs')
 const path = require('path')
 const jsdom = require('jsdom')
-hljs = require('highlight.js/lib/common')
+const hljs = require('highlight.js/lib/common')
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const macros = require('govuk-frontend/govuk-prototype-kit.config.json').nunjucksMacros
@@ -154,24 +154,10 @@ router.get('/produce-branching-code', (req, res) => {
 })
 
 router.get('/code-review', (req, res) => {
+  const nameOfInput = req.session.data.nameOfInput
   const code = req.session.data.code
   const highlightedCode = hljs.highlight(code, {language: 'js'}).value
-  res.render('/branching-code', {highlightedCode, code})
-})
-// Add your routes here
-router.get('/where-do-you-live-answer', (req, res) => {
-    switch (req.session.data['whereDoYouLive']) {
-      case 'england':
-        res.redirect('/test')
-        break
-      case 'scotland':
-        res.redirect('/blah')
-        break
-      case 'wales':
-        res.redirect('/something')
-        break
-      case 'northern-ireland':
-        res.redirect('/yes')
-        break
-    }
+  const formCode = `<form action="${nameOfInput.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}-answer">\n  <!-- Your form field goes here -->\n</form>`
+  const highlightedFormCode = hljs.highlight(formCode, {language: 'html'}).value
+  res.render('/branching-code', {highlightedCode, highlightedFormCode})
 })

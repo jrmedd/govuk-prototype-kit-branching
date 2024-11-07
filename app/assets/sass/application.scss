@@ -188,13 +188,6 @@
 
 .govuk-code-container { 
   position: relative;
-  &:before {
-    content: 'Use this code in routes.js';
-    font-family: $govuk-font-family;;
-    position: absolute;
-    top: govuk-spacing(2);
-    left: govuk-spacing(2);
-  }
   pre {
     background-color: govuk-colour('light-grey');
     padding: 1rem;
